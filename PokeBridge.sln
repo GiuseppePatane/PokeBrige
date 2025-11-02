@@ -1,0 +1,34 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PokeBridge.Api", "src\PokeBridge.Api\PokeBridge.Api.csproj", "{45537A50-F5F8-4776-BB40-6C1EE9D9D335}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PokeBridge.Core", "src\PokeBridge.Core\PokeBridge.Core.csproj", "{48D5438C-12C8-4F40-9656-B493F36D5B73}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PokeBridge.UnitTest", "test\PokeBridge.UnitTest\PokeBridge.UnitTest.csproj", "{1E4DA4D4-1EF5-4BAD-AAA1-D3A560D18EC6}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PokeBridge.Infrastructure", "src\PokeBridge.Infrastructure\PokeBridge.Infrastructure.csproj", "{3F5AE5BF-4752-4ADE-815D-DE3402528F12}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{45537A50-F5F8-4776-BB40-6C1EE9D9D335}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{45537A50-F5F8-4776-BB40-6C1EE9D9D335}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{45537A50-F5F8-4776-BB40-6C1EE9D9D335}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{45537A50-F5F8-4776-BB40-6C1EE9D9D335}.Release|Any CPU.Build.0 = Release|Any CPU
+		{48D5438C-12C8-4F40-9656-B493F36D5B73}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{48D5438C-12C8-4F40-9656-B493F36D5B73}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{48D5438C-12C8-4F40-9656-B493F36D5B73}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{48D5438C-12C8-4F40-9656-B493F36D5B73}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1E4DA4D4-1EF5-4BAD-AAA1-D3A560D18EC6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1E4DA4D4-1EF5-4BAD-AAA1-D3A560D18EC6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1E4DA4D4-1EF5-4BAD-AAA1-D3A560D18EC6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1E4DA4D4-1EF5-4BAD-AAA1-D3A560D18EC6}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3F5AE5BF-4752-4ADE-815D-DE3402528F12}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3F5AE5BF-4752-4ADE-815D-DE3402528F12}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3F5AE5BF-4752-4ADE-815D-DE3402528F12}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3F5AE5BF-4752-4ADE-815D-DE3402528F12}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal
