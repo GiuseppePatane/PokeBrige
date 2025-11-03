@@ -1,0 +1,17 @@
+{
+  "Servers": {
+    "1": {
+      "Name": "PokeBridge Postgres",
+      "Group": "Servers",
+      "Host": "postgres",
+      "Port": 5432,
+      "MaintenanceDB": "postgres",
+      "Username": "postgres",
+      "Password": "postgres",
+      "SSLMode": "prefer",
+      "PassFile": "",
+      "Comment": "Auto-configured server for local development"
+    }
+  }
+}
+

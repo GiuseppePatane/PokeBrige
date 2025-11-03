@@ -49,8 +49,13 @@ public static class ServiceCollectionExtensions
     {
         services.AddScoped<IPokemonClient, PokeClient>();
         services.AddTransient<PokeApiClient>();
-        services.AddHttpClient<ITranslatorClient,TranslatorHttpClient>(configuration["HttpClients:FunTranslationsApiBaseUrl"] ??
-                                                                       throw new InvalidOperationException());
+        services.AddHttpClient<ITranslatorClient, TranslatorHttpClient>(x =>
+        {
+            x.BaseAddress = new Uri(configuration["HttpClients:FunTranslationsApiBaseUrl"]) ??
+                            throw new InvalidOperationException();
+        });
+            
+          
         return services;
     }
 
