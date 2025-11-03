@@ -96,7 +96,7 @@ public class TranslationRateLimitTests : IntegrationTestBase
     }
 
     [Fact]
-    public async Task GetTranslatedPokemon_AfterRateLimit_SubsequentRequestsUseCachedOriginal()
+    public async Task GetTranslatedPokemon_AfterRateLimit_RetriesTranslationOnSubsequentRequests()
     {
         // Arrange
         await ClearDatabaseAsync();
@@ -113,7 +113,7 @@ public class TranslationRateLimitTests : IntegrationTestBase
             .Setup(x => x.GetPokemonRaceAsync("Mewtwo"))
             .ReturnsAsync(Result<PokemonRace>.Success(pokemon));
 
-        // First call: rate limit exceeded
+        // Both calls: rate limit exceeded (persistent rate limit)
         _translatorClientMock
             .Setup(x => x.GetTranslationAsync(
                 It.IsAny<string>(),
@@ -125,7 +125,7 @@ public class TranslationRateLimitTests : IntegrationTestBase
         // Act - First request (rate limit hit)
         var result1 = await _pokemonService.GetTranslatedPokemonRace("Mewtwo");
 
-        // Act - Second request (should use database, no translation call)
+        // Act - Second request (retries translation since it wasn't saved)
         var result2 = await _pokemonService.GetTranslatedPokemonRace("Mewtwo");
 
         // Assert
@@ -135,15 +135,15 @@ public class TranslationRateLimitTests : IntegrationTestBase
         result2.IsSuccess.ShouldBeTrue();
         result2.Value.Description.ShouldBe("Legendary psychic pokemon"); // Still original
 
-        // Translation API should only be called once (first request)
+        // Translation API should be called TWICE (retries on second request since no translation was saved)
         _translatorClientMock.Verify(
             x => x.GetTranslationAsync(
                 It.IsAny<string>(),
-                It.IsAny<TranslationType>(),
+                TranslationType.Yoda,
                 It.IsAny<CancellationToken>()),
-            Times.Once);
+            Times.Exactly(2));
 
-        // Pokemon API should also only be called once (cached in DB)
+        // Pokemon API should only be called once (cached in DB after first request)
         _pokemonClientMock.Verify(
             x => x.GetPokemonRaceAsync("Mewtwo"),
             Times.Once);
