@@ -104,15 +104,11 @@ The api uses a multi-layer caching approach with FusionCache:
 docker-compose up -d
 ```
 
-2. Run database migrations:
-```bash
-dotnet ef database update --project src/PokeBridge.Infrastructure --startup-project src/PokeBridge.Api
-```
-
 3. Run the application:
 ```bash
 dotnet run --project src/PokeBridge.Api
 ```
+> the application will ran the migrations automatically on startup.
 
 4. Access the API:
 - Swagger UI: https://localhost:7111/swagger
@@ -123,33 +119,6 @@ dotnet run --project src/PokeBridge.Api
 Run all tests:
 ```bash
 dotnet test
-```
-
-Run specific test categories:
-```bash
-# Unit tests only
-dotnet test --filter "FullyQualifiedName~UnitTest"
-
-# Integration tests only
-dotnet test --filter "FullyQualifiedName~IntegrationTest"
-```
-
-## Configuration
-
-### appsettings.Development.json
-```json
-{
-  "ConnectionStrings": {
-    "PokeBridgeDatabase": "Server=localhost;port=5434;Database=pokebridge;..."
-  },
-  "Redis": {
-    "Configuration": "localhost:6379",
-    "InstanceName": "PokeBridge_Dev_"
-  },
-  "HttpClients": {
-    "FunTranslationsApiBaseUrl": "https://api.funtranslations.com"
-  }
-}
 ```
 
 ## Project Structure
