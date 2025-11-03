@@ -21,11 +21,18 @@ public class TranslatorHttpClient : ITranslatorClient
         _logger = logger;
     }
 
-    public async Task<Result<string>> GetTranslationAsync(string text,TranslationType translationType)
+    public async Task<Result<string>> GetTranslationAsync(
+        string text,
+        TranslationType translationType,
+        CancellationToken cancellationToken = default)
     {
         try
         {
-          _logger.LogInformation("Requesting {TranslationType} translation for text: {Text}", translationType, text);
+            _logger.LogInformation(
+                "Requesting {TranslationType} translation for text: {Text}",
+                translationType,
+                text);
+
             Uri url;
             switch (translationType)
             {
@@ -33,16 +40,16 @@ public class TranslatorHttpClient : ITranslatorClient
                     url = TranslationUrlBuilder.BuildShakespeareTranslationUri(text);
                     break;
                 case TranslationType.Yoda:
-                    url= TranslationUrlBuilder.BuildYodaTranslationUri(text);
+                    url = TranslationUrlBuilder.BuildYodaTranslationUri(text);
                     break;
                 default:
-                    return Result<string>.Failure(new TranslatorClientError("Unsupported translation type"));
-                
+                    return Result<string>.Failure(
+                        new TranslatorClientError("Unsupported translation type"));
             }
-            
-            var response = await _client.GetAsync(url);
 
-            var content = await response.Content.ReadAsStringAsync();
+            var response = await _client.GetAsync(url, cancellationToken);
+
+            var content = await response.Content.ReadAsStringAsync(cancellationToken);
 
             if (!response.IsSuccessStatusCode)
             {
@@ -60,6 +67,7 @@ public class TranslatorHttpClient : ITranslatorClient
 
             var translated = translationResponse?.Contents?.Translated;
             _logger.LogInformation("Received translation: {TranslatedText}", translated);
+
             return string.IsNullOrWhiteSpace(translated)
                 ? Result<string>.Failure(new TranslatorClientError("Empty translation received"))
                 : Result<string>.Success(translated);

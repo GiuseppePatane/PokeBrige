@@ -14,6 +14,7 @@ public class PokemonRace
         Description = description;
         Habitat = habitat;
         IsLegendary = isLegendary;
+        CreatedAt = DateTime.UtcNow;
     }
 
     public int Id { get; }
@@ -22,6 +23,8 @@ public class PokemonRace
     public string Habitat { get; set; }
     public bool IsLegendary { get; set; }
     public  Dictionary<TranslationType, string> Translations { get; } = new();
+    public DateTime CreatedAt { get; private set; } 
+    public DateTime? UpdatedAt { get; private set; }
 
     public static Result<PokemonRace> Create(int id, string name, string description, string habitat, bool isLegendary)
     {
@@ -44,7 +47,13 @@ public class PokemonRace
             return Result.Failure(new ValidationError(nameof(type), $"Invalid translation type: {type}"));
 
         Translations[type] = translatedDescription;
+        UpdatedAt = DateTime.UtcNow;
         return Result.Ok();
+    }
+    
+    public bool HasTranslation(TranslationType type)
+    {
+        return Translations.ContainsKey(type);
     }
 
     public PokemonResult ToPokemonResult(TranslationType translationType)
