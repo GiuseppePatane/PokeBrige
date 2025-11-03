@@ -126,15 +126,3 @@ dotnet test
 PokeBridge.Api - REST API layer
 PokeBridge.Core - Domain logic & business rules
 PokeBridge.Infrastructure - External dependencies (DB, HTTP clients, caching)   
-
-
-```
-PokeBridge/
-├── src/
-│   ├── PokeBridge.Api/              # REST API layer
-│   ├── PokeBridge.Core/             # Domain logic & business rules
-│   └── PokeBridge.Infrastructure/   # External dependencies (DB, HTTP clients, caching)
-└── test/
-    ├── PokeBridge.UnitTest/         # Unit tests (fast, isolated)
-    └── PokeBridge.IntegrationTest/  # Integration tests (with Testcontainers)
-```

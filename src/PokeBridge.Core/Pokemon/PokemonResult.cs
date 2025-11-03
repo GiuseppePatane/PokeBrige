@@ -1,4 +1,4 @@
-namespace PokeBridge.Core;
+namespace PokeBridge.Core.Pokemon;
 
 
 
