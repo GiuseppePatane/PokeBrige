@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Caching.StackExchangeRedis;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -19,23 +20,42 @@ public static class ServiceCollectionExtensions
 {
     public static IServiceCollection AddInfrastructureServices(this IServiceCollection services,IConfiguration configuration)
     {
-        // External API Clients
+        services.AddExternalService(configuration);
+        services.AddDatabase(configuration);
+        services.AddRepositories();
+        services.AddCache(configuration);
+        services.AddDomainService();
+        return services;
+    }
+
+    private static IServiceCollection AddDomainService(this IServiceCollection services)
+    {
+        services.AddScoped<ITranslationTypeSelector, TranslationTypeSelector>();
+        services.AddScoped<ITranslationService, TranslationService>();
+        services.AddScoped<PokemonService>();
+        return services;
+    }
+    
+    private static IServiceCollection AddHttpClients(this IServiceCollection services, string baseAddress)
+    {
+        services.AddHttpClient<ITranslatorClient,TranslatorHttpClient>(client =>
+        {
+            client.BaseAddress = new Uri(baseAddress);
+        });
+        return services;
+    }
+
+    private static IServiceCollection AddExternalService (this IServiceCollection services, IConfiguration configuration)
+    {
         services.AddScoped<IPokemonClient, PokeClient>();
         services.AddTransient<PokeApiClient>();
-        services.AddHttpClients(configuration["HttpClients:FunTranslationsApiBaseUrl"] ?? throw new InvalidOperationException());
+        services.AddHttpClient<TranslatorHttpClient>(configuration["HttpClients:FunTranslationsApiBaseUrl"] ??
+                                                     throw new InvalidOperationException());
+        return services;
+    }
 
-        // Database
-        services.AddDbContext<PokeBridgeDbContext>(options =>
-            {
-                var dataSourceBuilder = new NpgsqlDataSourceBuilder(
-                    configuration.GetConnectionString("PokeBridgeDatabase") ??
-                    throw new InvalidOperationException());
-                dataSourceBuilder.EnableDynamicJson();
-                options.UseNpgsql(dataSourceBuilder.Build());
-            }
-        );
-
-        // Caching (Redis + FusionCache)
+    private static IServiceCollection AddCache(this IServiceCollection services, IConfiguration configuration)
+    {
         services.AddStackExchangeRedisCache(options =>
         {
             options.Configuration = configuration["Redis:Configuration"];
@@ -48,16 +68,44 @@ public static class ServiceCollectionExtensions
                 .SetDistributedCacheDuration(TimeSpan.FromHours(1))
                 .SetFailSafe(true))
             .WithSerializer(new FusionCacheSystemTextJsonSerializer())
+            .WithDistributedCache(
+                new RedisCache(new RedisCacheOptions
+                {
+                    Configuration = configuration["Redis:Configuration"]
+                })
+            )
             .WithBackplane(new RedisBackplane(new RedisBackplaneOptions
             {
                 Configuration = configuration["Redis:Configuration"]
             }));
 
-        // Repositories with Decorator Pattern
-        // Register concrete repository first
-        services.AddScoped<PokemonEfRepository>();
+        return services;
+    }
+    
+    private static IServiceCollection AddDatabase(this IServiceCollection services, IConfiguration configuration)
+    {
+        services.AddSingleton<NpgsqlDataSource>(sp =>
+        {
+            var dataSourceBuilder = new NpgsqlDataSourceBuilder(
+                configuration.GetConnectionString("PokeBridgeDatabase") ??
+                throw new InvalidOperationException());
+            dataSourceBuilder.EnableDynamicJson();
+            return dataSourceBuilder.Build();
+        });
 
-        // Decorate with caching layer
+        services.AddDbContext<PokeBridgeDbContext>((serviceProvider, options) =>
+        {
+            var dataSource = serviceProvider.GetRequiredService<NpgsqlDataSource>();
+            options.UseNpgsql(dataSource);
+        });
+        
+        return services;
+    }
+
+    private static IServiceCollection AddRepositories(this IServiceCollection services)
+    {
+        services.AddScoped<PokemonEfRepository>();
+        
         services.AddScoped<IPokemonRepository>(serviceProvider =>
         {
             var innerRepository = serviceProvider.GetRequiredService<PokemonEfRepository>();
@@ -67,20 +115,6 @@ public static class ServiceCollectionExtensions
             return new CachedPokemonRepository(innerRepository, cache, logger);
         });
 
-        // Domain Services
-        services.AddScoped<ITranslationTypeSelector, TranslationTypeSelector>();
-        services.AddScoped<ITranslationService, TranslationService>();
-        services.AddScoped<PokemonService>();
-
-        return services;
-    }
-    
-    private static IServiceCollection AddHttpClients(this IServiceCollection services, string baseAddress)
-    {
-        services.AddHttpClient<ITranslatorClient,TranslatorHttpClient>(client =>
-        {
-            client.BaseAddress = new Uri(baseAddress);
-        });
         return services;
     }
 }

@@ -13,7 +13,7 @@ public static partial class PokemonSpeciesExtensions
     )
     {
         if (pokemonSpecies is null || pokemonSpecies.Id <= 0)
-            return Result<PokemonRace>.Failure(new PokemonNotFoundError("null"));
+            return Result<PokemonRace>.Failure(new NotFoundError("null"));
 
         var description = ParseFlavorTextEntries(
             pokemonSpecies.FlavorTextEntries,
@@ -39,12 +39,14 @@ public static partial class PokemonSpeciesExtensions
         if (flavorTextsList is null || string.IsNullOrWhiteSpace(name))
             return string.Empty;
 
+        // Filter entries by language and clean up text
         var entries = flavorTextsList
             .Where(f => f.Language.Name.Equals(language, StringComparison.OrdinalIgnoreCase))
             .Select(f => f.FlavorText.RemoveInvalidCharacters())
             .Where(t => !string.IsNullOrWhiteSpace(t))
             .ToList();
 
+        // Try to find the best matching entry
         var match =
             entries.FirstOrDefault(t => t!.StartsWith(name, StringComparison.OrdinalIgnoreCase))
             ?? entries.FirstOrDefault(t => t!.Contains(name, StringComparison.OrdinalIgnoreCase))

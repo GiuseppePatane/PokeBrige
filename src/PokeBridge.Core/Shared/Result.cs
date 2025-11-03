@@ -3,7 +3,7 @@ using OneOf;
 namespace PokeBridge.Core.Shared;
 
 /// <summary>
-/// 
+/// Creates a result type for operations that return a value on success
 /// </summary>
 /// <typeparam name="TSuccess"></typeparam>
 public class Result<TSuccess> : OneOfBase<TSuccess, DomainError>

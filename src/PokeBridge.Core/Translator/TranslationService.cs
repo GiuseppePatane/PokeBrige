@@ -28,9 +28,14 @@ public class TranslationService : ITranslationService
         TranslationType translationType,
         CancellationToken ct = default)
     {
-        ArgumentNullException.ThrowIfNull(pokemon);
+       
+        if(pokemon==null)
+        {
+            _logger.LogError("Pokemon cannot be null");
+            return Result<string>.Failure(new ValidationError(nameof(pokemon), "Pokemon cannot be null"));
+        }
 
-        // Check if translation already exists
+        
         if (pokemon.HasTranslation(translationType))
         {
             _logger.LogDebug(
@@ -41,8 +46,7 @@ public class TranslationService : ITranslationService
             var existingTranslation = pokemon.Translations[translationType];
             return Result<string>.Success(existingTranslation);
         }
-
-        // Translation doesn't exist - fetch from external API
+        
         _logger.LogInformation(
             "Fetching new translation for pokemon {PokemonName} with type {TranslationType}",
             pokemon.Name,
@@ -59,12 +63,11 @@ public class TranslationService : ITranslationService
                 "Failed to retrieve translation for {PokemonName}: {ErrorMessage}. Returning original description.",
                 pokemon.Name,
                 translationResult.Error.Message);
-
-            // Fallback to original description
+            
+            //fallback to original description
             return Result<string>.Success(pokemon.Description);
         }
-
-        // Add translation to pokemon
+        
         var addResult = pokemon.AddTranslation(translationType, translationResult.Value);
         if (addResult.IsFailure)
         {
@@ -75,17 +78,16 @@ public class TranslationService : ITranslationService
 
             return Result<string>.Failure(addResult.Error);
         }
-
-        // Persist the translation
+        
         var saveResult = await _pokemonRepository.Save(pokemon, ct);
         if (saveResult.IsFailure)
         {
             _logger.LogWarning(
-                "Failed to persist translation for {PokemonName}: {ErrorMessage}. Translation will be used but not cached.",
+                "Failed to persist translation for {PokemonName}: {ErrorMessage}.",
                 pokemon.Name,
                 saveResult.Error.Message);
 
-            // Don't fail the request if persistence fails - we still have the translation
+           // still return the translation even if persisting failed
         }
         else
         {

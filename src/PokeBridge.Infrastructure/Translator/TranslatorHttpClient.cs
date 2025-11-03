@@ -51,10 +51,25 @@ public class TranslatorHttpClient : ITranslatorClient
 
             var content = await response.Content.ReadAsStringAsync(cancellationToken);
 
+            // Handle rate limit (429 Too Many Requests)
+            if (response.StatusCode == System.Net.HttpStatusCode.TooManyRequests)
+            {
+                _logger.LogWarning(
+                    "Rate limit exceeded for FunTranslations API. Using original description.");
+
+                return Result<string>.Failure(
+                    new RateLimitExceededError(
+                        "Translation API rate limit exceeded. Using original description."));
+            }
+
             if (!response.IsSuccessStatusCode)
             {
                 var error = JsonSerializer.Deserialize<ErrorResponse>(content, JsonOptions);
-                _logger.LogError("Translation API error: {ErrorMessage}", error?.Error?.Message);
+                _logger.LogError(
+                    "Translation API error (Status: {StatusCode}): {ErrorMessage}",
+                    response.StatusCode,
+                    error?.Error?.Message);
+
                 return Result<string>.Failure(
                     new TranslatorClientError(error?.Error?.Message ?? "Translation API error")
                 );
@@ -84,3 +99,6 @@ public class TranslatorHttpClient : ITranslatorClient
 
 public record TranslatorClientError(string Message)
     : DomainError("TRANSLATOR_CLIENT_ERROR", Message);
+
+public record RateLimitExceededError(string Message)
+    : DomainError("RATE_LIMIT_EXCEEDED", Message);

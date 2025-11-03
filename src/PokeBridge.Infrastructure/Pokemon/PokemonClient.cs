@@ -15,8 +15,7 @@ public class PokeClient : IPokemonClient
     }
 
     /// <summary>
-    ///     Get Pokemon Race Information using  PokeApiClient
-    ///     status code not found  will throw  an PokemonNotFoundException
+    /// Get Pokemon Race Information using PokeApiClient
     /// </summary>
     /// <param name="pokemon"></param>
     /// <returns></returns>
@@ -31,7 +30,7 @@ public class PokeClient : IPokemonClient
         }
         catch (HttpRequestException e) when (e.StatusCode == HttpStatusCode.NotFound)
         {
-            return Result<PokemonRace>.Failure(new PokemonNotFoundError(pokemon));
+            return Result<PokemonRace>.Failure(new NotFoundError(pokemon));
         }
         catch (Exception e)
         {

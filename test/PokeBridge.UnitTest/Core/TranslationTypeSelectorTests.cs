@@ -1,4 +1,4 @@
-using FluentAssertions;
+using Shouldly;
 using PokeBridge.Core.Pokemon;
 using PokeBridge.Core.Shared;
 
@@ -23,7 +23,7 @@ public class TranslationTypeSelectorTests
         var result = _sut.SelectTranslationType(pokemon);
 
         // Assert
-        result.Should().Be(TranslationType.Yoda);
+        result.ShouldBe(TranslationType.Yoda);
     }
 
     [Fact]
@@ -36,7 +36,7 @@ public class TranslationTypeSelectorTests
         var result = _sut.SelectTranslationType(pokemon);
 
         // Assert
-        result.Should().Be(TranslationType.Yoda);
+        result.ShouldBe(TranslationType.Yoda);
     }
 
     [Fact]
@@ -49,7 +49,7 @@ public class TranslationTypeSelectorTests
         var result = _sut.SelectTranslationType(pokemon);
 
         // Assert
-        result.Should().Be(TranslationType.Yoda);
+        result.ShouldBe(TranslationType.Yoda);
     }
 
     [Fact]
@@ -62,7 +62,7 @@ public class TranslationTypeSelectorTests
         var result = _sut.SelectTranslationType(pokemon);
 
         // Assert
-        result.Should().Be(TranslationType.Shakespeare);
+        result.ShouldBe(TranslationType.Shakespeare);
     }
 
     [Fact]
@@ -75,7 +75,7 @@ public class TranslationTypeSelectorTests
         var result = _sut.SelectTranslationType(pokemon);
 
         // Assert
-        result.Should().Be(TranslationType.Shakespeare);
+        result.ShouldBe(TranslationType.Shakespeare);
     }
 
     [Fact]
@@ -88,17 +88,14 @@ public class TranslationTypeSelectorTests
         var result = _sut.SelectTranslationType(pokemon);
 
         // Assert
-        result.Should().Be(TranslationType.Shakespeare);
+        result.ShouldBe(TranslationType.Shakespeare);
     }
 
     [Fact]
     public void SelectTranslationType_WhenPokemonIsNull_ThrowsArgumentNullException()
     {
-        // Act
-        Action act = () => _sut.SelectTranslationType(null!);
-
-        // Assert
-        act.Should().Throw<ArgumentNullException>();
+        // Act & Assert
+        Should.Throw<ArgumentNullException>(() => _sut.SelectTranslationType(null!));
     }
 
     [Theory]
@@ -115,6 +112,6 @@ public class TranslationTypeSelectorTests
         var result = _sut.SelectTranslationType(pokemon);
 
         // Assert
-        result.Should().Be(TranslationType.Shakespeare);
+        result.ShouldBe(TranslationType.Shakespeare);
     }
 }

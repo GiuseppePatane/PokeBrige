@@ -15,16 +15,11 @@ public class TranslationTypeSelector : ITranslationTypeSelector
     {
         ArgumentNullException.ThrowIfNull(pokemon);
 
-        // Yoda for legendary pokemon
-        if (pokemon.IsLegendary)
-            return TranslationType.Yoda;
-
-        // Yoda for cave-dwelling pokemon
-        if (!string.IsNullOrWhiteSpace(pokemon.Habitat) &&
-            pokemon.Habitat.Equals("cave", StringComparison.OrdinalIgnoreCase))
-            return TranslationType.Yoda;
-
-        // Shakespeare for all others
-        return TranslationType.Shakespeare;
+        return
+            pokemon.IsLegendary
+            || !string.IsNullOrWhiteSpace(pokemon.Habitat)
+                && pokemon.Habitat.Equals("cave", StringComparison.OrdinalIgnoreCase)
+            ? TranslationType.Yoda
+            : TranslationType.Shakespeare;
     }
 }

@@ -8,7 +8,6 @@ namespace PokeBridge.Infrastructure.Pokemon;
 
 /// <summary>
 /// Entity Framework implementation of pokemon repository
-/// Handles persistence and retrieval of pokemon data
 /// </summary>
 public class PokemonEfRepository : IPokemonRepository
 {
@@ -27,7 +26,7 @@ public class PokemonEfRepository : IPokemonRepository
     /// <param name="name">Pokemon name to search for</param>
     /// <param name="ct">Cancellation token</param>
     /// <returns>Pokemon race if found, error otherwise</returns>
-    public async Task<Result<PokemonRace>> GetByName(string name, CancellationToken ct = default)
+    public async Task<Result<PokemonRace?>> GetByName(string name, CancellationToken ct = default)
     {
         try
         {
@@ -35,7 +34,7 @@ public class PokemonEfRepository : IPokemonRepository
             if (string.IsNullOrWhiteSpace(name))
             {
                 _logger.LogWarning("GetByName called with null or empty name");
-                return Result<PokemonRace>.Failure(
+                return Result<PokemonRace?>.Failure(
                     new ValidationError(nameof(name), "Name cannot be null or empty"));
             }
             
@@ -54,7 +53,7 @@ public class PokemonEfRepository : IPokemonRepository
                     "Pokemon with name {PokemonName} not found in database",
                     normalizedName);
 
-                return Result<PokemonRace>.Failure(
+                return Result<PokemonRace?>.Failure(
                     new NotFoundError($"No pokemon found with name '{name}'"));
             }
 
@@ -77,7 +76,7 @@ public class PokemonEfRepository : IPokemonRepository
                 "Database error occurred while retrieving pokemon with name {PokemonName}",
                 name);
 
-            return Result<PokemonRace>.Failure(
+            return Result<PokemonRace?>.Failure(
                 new PersistenceError("An error occurred while accessing the database"));
         }
     }
@@ -94,7 +93,6 @@ public class PokemonEfRepository : IPokemonRepository
     {
         try
         {
-            // Validate input
             if (race == null)
             {
                 _logger.LogWarning("Save called with null pokemon race");
@@ -106,23 +104,22 @@ public class PokemonEfRepository : IPokemonRepository
                 "Saving pokemon {PokemonName} (ID: {PokemonId})",
                 race.Name,
                 race.Id);
-
-            // Check if pokemon already exists by ID (primary key - most efficient)
+            
             var existingRace = await _dbContext.PokemonRaces
                 .FirstOrDefaultAsync(p => p.Id == race.Id, ct);
 
             if (existingRace != null)
             {
-                // Update existing pokemon
+           
                 _logger.LogDebug(
                     "Updating existing pokemon {PokemonName} (ID: {PokemonId})",
                     race.Name,
                     race.Id);
 
-            
-                _dbContext.Entry(existingRace).CurrentValues.SetValues(race);
                 
-
+                 existingRace.UpdateFrom(race);
+                 _dbContext.PokemonRaces.Update(existingRace);
+                
                 _logger.LogInformation(
                     "Pokemon {PokemonName} (ID: {PokemonId}) updated in database",
                     race.Name,

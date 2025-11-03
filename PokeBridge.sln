@@ -8,6 +8,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PokeBridge.UnitTest", "test
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PokeBridge.Infrastructure", "src\PokeBridge.Infrastructure\PokeBridge.Infrastructure.csproj", "{3F5AE5BF-4752-4ADE-815D-DE3402528F12}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PokeBridge.IntegrationTest", "test\PokeBridge.IntegrationTest\PokeBridge.IntegrationTest.csproj", "{3DE120E2-D281-4321-BE4B-566B35639481}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -30,5 +32,9 @@ Global
 		{3F5AE5BF-4752-4ADE-815D-DE3402528F12}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{3F5AE5BF-4752-4ADE-815D-DE3402528F12}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{3F5AE5BF-4752-4ADE-815D-DE3402528F12}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3DE120E2-D281-4321-BE4B-566B35639481}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3DE120E2-D281-4321-BE4B-566B35639481}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3DE120E2-D281-4321-BE4B-566B35639481}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3DE120E2-D281-4321-BE4B-566B35639481}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

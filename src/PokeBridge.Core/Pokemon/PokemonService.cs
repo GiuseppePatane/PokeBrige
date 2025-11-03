@@ -31,11 +31,11 @@ public class PokemonService
     }
 
     /// <summary>
-    /// Gets basic pokemon information without translation
+    /// Gets basic pokemon information
     /// </summary>
     /// <param name="pokemonName">The name of the pokemon</param>
     /// <param name="ct">Cancellation token</param>
-    /// <returns>Pokemon result with original description</returns>
+    /// <returns>Pokemon result with  description</returns>
     public async Task<Result<PokemonResult>> GetPokemon(
         string pokemonName,
         CancellationToken ct = default)
@@ -84,8 +84,7 @@ public class PokemonService
             return Result<PokemonResult>.Failure(
                 new ValidationError(nameof(pokemonName), "Pokemon name cannot be empty"));
         }
-
-        // Get pokemon race
+        
         var pokemonRace = await GetPokemonRaceAsync(pokemonName, ct);
         if (pokemonRace.IsFailure)
         {
@@ -96,16 +95,14 @@ public class PokemonService
 
             return Result<PokemonResult>.Failure(pokemonRace.Error);
         }
-
-        // Determine translation type
+        
         var translationType = _translationTypeSelector.SelectTranslationType(pokemonRace.Value);
 
         _logger.LogInformation(
             "Selected translation type {TranslationType} for pokemon {PokemonName}",
             translationType,
             pokemonName);
-
-        // Get or create translation
+        
         var translationResult = await _translationService.GetOrCreateTranslationAsync(
             pokemonRace.Value,
             translationType,
@@ -120,8 +117,7 @@ public class PokemonService
 
             return Result<PokemonResult>.Failure(translationResult.Error);
         }
-
-        // Build result with translated description
+        
         var result = new PokemonResult
         {
             Name = pokemonRace.Value.Name,
@@ -135,7 +131,6 @@ public class PokemonService
 
     /// <summary>
     /// Gets pokemon race from repository or external API
-    /// Handles caching and persistence automatically
     /// </summary>
     /// <param name="pokemonName">The name of the pokemon</param>
     /// <param name="ct">Cancellation token</param>
@@ -164,7 +159,7 @@ public class PokemonService
 
         if (pokemonRaceResult.IsFailure)
         {
-            return pokemonRaceResult;
+            return pokemonRaceResult; // Propagate the error
         }
         
         var saveResult = await _pokemonRepository.Save(pokemonRaceResult.Value, ct);
