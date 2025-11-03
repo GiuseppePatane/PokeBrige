@@ -1,6 +1,40 @@
-@PokeBridge.Api_HostAddress = http://localhost:5242
+@baseUrl = https://localhost:7111
 
-GET {{PokeBridge.Api_HostAddress}}/weatherforecast/
+
+# GET POKEMON - Basic Information. no translation.
+
+### Get Pokemon - Pikachu (Normal Pokemon)
+GET {{baseUrl}}/Pokemon/Butterfree
 Accept: application/json
 
-###
+### Get Pokemon - Mewtwo (Legendary Pokemon)
+GET {{baseUrl}}/Pokemon/mewtwo
+Accept: application/json
+
+### Get Pokemon - Zubat (Cave Pokemon)
+GET {{baseUrl}}/Pokemon/zubat
+Accept: application/json
+
+### Get Pokemon - Not Found (Should return 404)
+GET {{baseUrl}}/Pokemon/gallina
+Accept: application/json
+
+# GET POKEMON TRANSLATED - With Automatic Translation Selection
+### Get Translated Pokemon - Pikachu (Forest -> Shakespeare)
+# Expected: Shakespeare translation since it's not legendary and lives in forest
+GET {{baseUrl}}/Pokemon/translated/pikachu
+Accept: application/json
+
+### Get Translated Pokemon - Mewtwo (Legendary -> Yoda)
+# Expected: Yoda translation because it's legendary
+GET {{baseUrl}}/Pokemon/translated/mewtwo
+Accept: application/json
+
+### Get Translated Pokemon - Charizard (Mountain -> Shakespeare)
+# Expected: Shakespeare translation (not legendary, not cave)
+GET {{baseUrl}}/Pokemon/translated/charizard
+Accept: application/json
+
+### Get Translated Pokemon - Not Found (Should return 404)
+GET {{baseUrl}}/Pokemon/translated/nonexistentpokemon
+Accept: application/json
