@@ -103,12 +103,16 @@ The api uses a multi-layer caching approach with FusionCache:
 ```bash
 docker-compose up -d
 ```
+The `docker-compose.yml` file includes also PgAdmin for easy DB management, and Redis Commander for Redis inspection.
+
+PgAdmin: http://localhost:5050/browser/
+Redis Commander: http://localhost:8081/
 
 3. Run the application:
 ```bash
 dotnet run --project src/PokeBridge.Api
 ```
-> the application will ran the migrations automatically on startup.
+> the application will run the migrations automatically on startup.
 
 4. Access the API:
 - Swagger UI: https://localhost:7111/swagger
