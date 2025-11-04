@@ -4,12 +4,14 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Npgsql;
+using Polly;
 using PokeApiNet;
 using PokeBridge.Core.Pokemon;
 using PokeBridge.Core.Translator;
 using PokeBridge.Infrastructure.EF;
 using PokeBridge.Infrastructure.Pokemon;
 using PokeBridge.Infrastructure.Translator;
+using PokeBridge.Infrastructure.Translator.Policies;
 using ZiggyCreatures.Caching.Fusion;
 using ZiggyCreatures.Caching.Fusion.Backplane.StackExchangeRedis;
 using ZiggyCreatures.Caching.Fusion.Serialization.SystemTextJson;
@@ -36,26 +38,50 @@ public static class ServiceCollectionExtensions
         return services;
     }
     
-    private static IServiceCollection AddHttpClients(this IServiceCollection services, string baseAddress)
-    {
-        services.AddHttpClient<ITranslatorClient,TranslatorHttpClient>(client =>
-        {
-            client.BaseAddress = new Uri(baseAddress);
-        });
-        return services;
-    }
-
     private static IServiceCollection AddExternalService (this IServiceCollection services, IConfiguration configuration)
     {
         services.AddScoped<IPokemonClient, PokeClient>();
         services.AddTransient<PokeApiClient>();
+
+        // Configure HttpClient with Polly resilience policies
         services.AddHttpClient<ITranslatorClient, TranslatorHttpClient>(x =>
         {
             x.BaseAddress = new Uri(configuration["HttpClients:FunTranslationsApiBaseUrl"]) ??
                             throw new InvalidOperationException();
+            x.Timeout = TimeSpan.FromSeconds(30); // Overall timeout including retries
+        })
+        .AddPolicyHandler((serviceProvider, request) =>
+        {
+            var logger = serviceProvider.GetRequiredService<ILogger<TranslatorHttpClient>>();
+            var context = new Context
+            {
+                ["logger"] = logger
+            };
+            request.SetPolicyExecutionContext(context);
+            return HttpClientTranslationPolicies.GetRetryPolicy();
+        })
+        .AddPolicyHandler((serviceProvider, request) =>
+        {
+            var logger = serviceProvider.GetRequiredService<ILogger<TranslatorHttpClient>>();
+            var context = new Context
+            {
+                ["logger"] = logger
+            };
+            request.SetPolicyExecutionContext(context);
+            return HttpClientTranslationPolicies.GetCircuitBreakerPolicy();
+        })
+        .AddPolicyHandler((serviceProvider, request) =>
+        {
+            var logger = serviceProvider.GetRequiredService<ILogger<TranslatorHttpClient>>();
+            var context = new Polly.Context
+            {
+                ["logger"] = logger
+            };
+            request.SetPolicyExecutionContext(context);
+            return HttpClientTranslationPolicies.GetTimeoutPolicy();
         });
-            
-          
+
+
         return services;
     }
 
