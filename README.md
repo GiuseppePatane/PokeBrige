@@ -89,7 +89,7 @@ The api uses a multi-layer caching approach with FusionCache:
 
 ### Cache Invalidation
 - Cache is invalidated when Pokemon data is updated (e.g., new translation added)
-- Redis backplane notifies all instances about cache invalidation
+- [FusionCache Redis backplane](https://github.com/ZiggyCreatures/FusionCache/blob/main/docs/Backplane.md) notifies all instances about cache invalidation
 
 ## Running Locally
 
