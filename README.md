@@ -125,8 +125,10 @@ Run all tests:
 dotnet test
 ```
 
+>  Make sure to have Docker up and running for integration tests.
+
 ## Project Structure
 
-PokeBridge.Api - REST API layer
-PokeBridge.Core - Domain logic & business rules
-PokeBridge.Infrastructure - External dependencies (DB, HTTP clients, caching)   
+* PokeBridge.Api - REST API layer
+* PokeBridge.Core - Domain logic & business rules
+* PokeBridge.Infrastructure - External dependencies (DB, HTTP clients, caching)   
